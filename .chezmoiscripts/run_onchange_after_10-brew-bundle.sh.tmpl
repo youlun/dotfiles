@@ -8,3 +8,11 @@ brew bundle --file="${HOME}/Brewfile" --no-lock || {
     echo "Warning: brew bundle had failures."
     echo "  - If MAS apps failed, sign into the App Store and re-run: chezmoi apply"
 }
+
+{{ if .is_mbp -}}
+# Create OrbStack SSH config placeholder so Include doesn't warn before first launch
+if [ ! -f ~/.orbstack/ssh/config ]; then
+    mkdir -p ~/.orbstack/ssh
+    touch ~/.orbstack/ssh/config
+fi
+{{ end -}}
