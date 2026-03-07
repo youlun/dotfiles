@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+      - name: Lint shell scripts
+        run: |
+          shopt -s globstar nullglob
+          # .sh.tmpl files are excluded — chezmoi template directives break shellcheck
+          files=(bootstrap.sh verify.sh .chezmoiscripts/*.sh)
+          if [ ${#files[@]} -gt 0 ]; then
+            shellcheck "${files[@]}"
+          fi
+
+  chezmoi-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+      - name: Validate templates
+        run: |
+          # Provide mock data so template variables resolve
+          mkdir -p /tmp/chezmoi-test
+          cat > /tmp/chezmoi-test/chezmoi.toml <<'TOML'
+          [data]
+              profile = "yw-macbook-pro"
+              is_mbp = true
+              is_mini = false
+          TOML
+          for f in $(find . -name '*.tmpl' ! -path './.chezmoi.toml.tmpl' ! -path './.git/*'); do
+            echo "Checking $f..."
+            chezmoi execute-template --source . --config /tmp/chezmoi-test/chezmoi.toml < "$f" > /dev/null
+          done
