@@ -16,6 +16,7 @@ jobs:
       - name: Lint shell scripts
         run: |
           shopt -s globstar nullglob
+          # .sh.tmpl files are excluded — chezmoi template directives break shellcheck
           files=(bootstrap.sh verify.sh .chezmoiscripts/*.sh)
           if [ ${#files[@]} -gt 0 ]; then
             shellcheck "${files[@]}"
@@ -40,5 +41,5 @@ jobs:
           TOML
           for f in $(find . -name '*.tmpl' ! -path './.chezmoi.toml.tmpl' ! -path './.git/*'); do
             echo "Checking $f..."
-            chezmoi execute-template --config /tmp/chezmoi-test/chezmoi.toml < "$f" > /dev/null
+            chezmoi execute-template --source . --config /tmp/chezmoi-test/chezmoi.toml < "$f" > /dev/null
           done
