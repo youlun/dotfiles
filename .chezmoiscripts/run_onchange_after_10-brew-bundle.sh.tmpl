@@ -3,4 +3,8 @@
 set -euo pipefail
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-brew bundle --file="${HOME}/Brewfile" --no-lock
+brew bundle --file="${HOME}/Brewfile" --no-lock || {
+    echo ""
+    echo "Warning: brew bundle had failures."
+    echo "  - If MAS apps failed, sign into the App Store and re-run: chezmoi apply"
+}
