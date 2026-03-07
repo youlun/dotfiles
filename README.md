@@ -18,7 +18,7 @@ Two profiles with shared base config:
 - **yw-macbook-pro** — full setup with IDE casks (VSCode, JetBrains), OrbStack, dev tools, and Mac App Store apps
 - **yw-mac-mini** — core CLI tools and essential GUI apps only
 
-## Fresh machine setup
+## Setup
 
 > Prerequisites: sign into Mac App Store (for MAS apps on MBP), verify FileVault is enabled.
 
@@ -26,19 +26,16 @@ Two profiles with shared base config:
 bash <(curl -fsSL https://raw.githubusercontent.com/youlun/dotfiles/main/bootstrap.sh)
 ```
 
-This installs Homebrew, chezmoi, then runs `chezmoi init --apply` which:
-- Prompts for profile (`yw-macbook-pro` or `yw-mac-mini`)
+The script is safe to re-run — it detects an existing checkout and runs `chezmoi update` instead of a fresh init.
+
+This installs Homebrew and chezmoi, then applies dotfiles which:
+- Prompts for profile (restricted to `yw-macbook-pro` or `yw-mac-mini`)
 - Places dotfiles
 - Installs Brewfile packages
 - Installs bat Catppuccin Mocha theme
 - Installs mise runtimes (Ruby, Node, Python)
 - Applies macOS defaults
-
-After bootstrap, run `verify.sh` to confirm all tools, packages, and runtimes are installed:
-
-```bash
-~/.local/share/chezmoi/verify.sh
-```
+- Runs verification automatically
 
 ## Manual steps after bootstrap
 
