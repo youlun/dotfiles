@@ -1,4 +1,5 @@
-{{- $profile := promptStringOnce . "profile" "Profile (yw-macbook-pro or yw-mac-mini)" -}}
+{{- $choices := list "yw-macbook-pro" "yw-mac-mini" -}}
+{{- $profile := promptChoiceOnce . "profile" "Profile" $choices -}}
 
 [data]
     profile = {{ $profile | quote }}
