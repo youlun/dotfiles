@@ -15,11 +15,11 @@ done
 
 echo ""
 echo "==> Checking brew bundle..."
-if brew bundle check --file="${HOME}/Brewfile" &>/dev/null; then
+if brew bundle check --file="${HOME}/.config/homebrew/Brewfile" &>/dev/null; then
     echo "  ✓ All Brewfile entries installed"
 else
     echo "  ✗ Some Brewfile entries missing"
-    brew bundle check --file="${HOME}/Brewfile" --verbose 2>&1 | head -20
+    brew bundle check --file="${HOME}/.config/homebrew/Brewfile" --verbose 2>&1 | head -20
     errors=$((errors + 1))
 fi
 

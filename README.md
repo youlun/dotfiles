@@ -60,4 +60,4 @@ chezmoi update                    # git pull + apply (on other machines)
 
 ## Adding packages
 
-Edit `Brewfile.tmpl`. Use `{{ if .is_mbp }}` blocks for MacBook Pro-only apps. The brew bundle script re-runs automatically on next `chezmoi apply`.
+Edit `dot_config/homebrew/Brewfile.tmpl`. Use `{{ if .is_mbp }}` blocks for MacBook Pro-only apps. The brew bundle script re-runs automatically on next `chezmoi apply`.
