@@ -15,14 +15,25 @@ fi
 # Apple Silicon — both target machines use /opt/homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-echo "==> Installing chezmoi..."
-brew install chezmoi
+if ! command -v chezmoi &>/dev/null; then
+    echo "==> Installing chezmoi..."
+    brew install chezmoi
+fi
 
-echo "==> Running chezmoi init --apply..."
-chezmoi init --apply --verbose https://github.com/youlun/dotfiles
+CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
+
+if [ -d "$CHEZMOI_SOURCE/.git" ]; then
+    echo "==> Updating dotfiles..."
+    chezmoi update --verbose
+else
+    echo "==> Initializing dotfiles..."
+    chezmoi init --apply --verbose https://github.com/youlun/dotfiles
+fi
 
 echo ""
-echo "Bootstrap complete. Run ./verify.sh to check."
+echo "==> Running verification..."
+bash "${CHEZMOI_SOURCE}/verify.sh"
+
 echo ""
 echo "Manual steps:"
 echo "  1. Open Bitwarden and sign in"
