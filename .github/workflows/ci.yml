@@ -24,20 +24,28 @@ jobs:
 
   chezmoi-validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - profile: yw-macbook-pro
+            is_mbp: true
+            is_mini: false
+          - profile: yw-mac-mini
+            is_mbp: false
+            is_mini: true
     steps:
       - uses: actions/checkout@v4
       - name: Install chezmoi
         run: |
           sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
-      - name: Validate templates
+      - name: Validate templates (${{ matrix.profile }})
         run: |
-          # Provide mock data so template variables resolve
           mkdir -p /tmp/chezmoi-test
-          cat > /tmp/chezmoi-test/chezmoi.toml <<'TOML'
+          cat > /tmp/chezmoi-test/chezmoi.toml <<TOML
           [data]
-              profile = "yw-macbook-pro"
-              is_mbp = true
-              is_mini = false
+              profile = "${{ matrix.profile }}"
+              is_mbp = ${{ matrix.is_mbp }}
+              is_mini = ${{ matrix.is_mini }}
           TOML
           for f in $(find . -name '*.tmpl' ! -path './.chezmoi.toml.tmpl' ! -path './.git/*'); do
             echo "Checking $f..."
