@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "$(uname -m)" != "arm64" ]; then
+    echo "Error: this setup targets Apple Silicon (arm64) only."
+    exit 1
+fi
+
 echo "==> Checking for Homebrew..."
 if ! command -v brew &>/dev/null; then
     echo "==> Installing Homebrew..."
