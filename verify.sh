@@ -24,6 +24,14 @@ else
 fi
 
 echo ""
+echo "==> Checking Bitwarden SSH agent..."
+if [ -S ~/.bitwarden-ssh-agent.sock ]; then
+    echo "  ✓ Bitwarden SSH agent socket found"
+else
+    echo "  ! Bitwarden SSH agent socket not found (start Bitwarden to activate)"
+fi
+
+echo ""
 echo "==> Checking mise runtimes..."
 for runtime in ruby node python; do
     if mise list "$runtime" 2>/dev/null | grep -q "$runtime"; then
