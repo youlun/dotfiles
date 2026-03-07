@@ -10,6 +10,7 @@
 [delta]
     navigate = true
     line-numbers = true
+    syntax-theme = Catppuccin Mocha
 [init]
     defaultBranch = main
 [pull]
