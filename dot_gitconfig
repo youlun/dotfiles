@@ -3,7 +3,6 @@
     email = youlun.wang@icloud.com
 [core]
     editor = vim
-    excludesFile = ~/.gitignore_global
     pager = delta
 [interactive]
     diffFilter = delta --color-only
