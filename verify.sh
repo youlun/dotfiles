@@ -34,7 +34,7 @@ fi
 echo ""
 echo "==> Checking mise runtimes..."
 for runtime in ruby node python; do
-    if mise list "$runtime" 2>/dev/null | grep -q "$runtime"; then
+    if mise which "$runtime" &>/dev/null; then
         echo "  ✓ $runtime"
     else
         echo "  ✗ $runtime NOT INSTALLED"
