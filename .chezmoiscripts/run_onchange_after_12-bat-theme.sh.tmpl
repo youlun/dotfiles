@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# bat theme: Catppuccin Mocha
+# Brewfile hash: {{ include "Brewfile.tmpl" | sha256sum }}
+set -euo pipefail
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+if ! command -v bat &>/dev/null; then
+    echo "bat not found, skipping theme install"
+    exit 0
+fi
+
+theme_dir="$(bat --config-dir)/themes"
+mkdir -p "$theme_dir"
+
+echo "==> Installing bat Catppuccin Mocha theme..."
+curl -fsSL -o "${theme_dir}/Catppuccin Mocha.tmTheme" \
+    "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme"
+
+bat cache --build
+echo "  Done."
