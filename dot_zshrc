@@ -1,0 +1,32 @@
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE
+
+# Completion
+fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+autoload -Uz compinit
+compinit
+
+# Prompt
+command -v starship &>/dev/null && eval "$(starship init zsh)"
+
+# Environment
+command -v bat &>/dev/null && export BAT_THEME="Catppuccin Mocha"
+[ -S ~/.bitwarden-ssh-agent.sock ] && export SSH_AUTH_SOCK=~/.bitwarden-ssh-agent.sock
+
+# Aliases
+command -v bat &>/dev/null && alias cat='bat'
+command -v eza &>/dev/null && { alias ls='eza --icons=auto --group-directories-first'; alias ll='eza -la --icons=auto --group-directories-first'; }
+
+# Tools
+command -v zoxide &>/dev/null && eval "$(zoxide init zsh)"
+command -v fzf &>/dev/null && source <(fzf --zsh)
+command -v atuin &>/dev/null && eval "$(atuin init zsh)"
+
+# mise — must be last
+command -v mise &>/dev/null && eval "$(mise activate zsh)"

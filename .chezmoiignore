@@ -1,0 +1,9 @@
+README.md
+LICENSE
+bootstrap.sh
+verify.sh
+
+{{ if not .is_mbp }}
+Library/Application Support/Code/User/settings.json
+Library/Application Support/Code/User/keybindings.json
+{{ end }}

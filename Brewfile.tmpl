@@ -1,0 +1,60 @@
+# Managed by chezmoi — do not edit directly
+
+# ── CLI tools (both machines) ────────────────────────────────
+brew "git"
+brew "gh"
+brew "mise"
+brew "zoxide"
+brew "fzf"
+brew "fd"
+brew "ripgrep"
+brew "bat"
+brew "eza"
+brew "lazygit"
+brew "starship"
+brew "atuin"
+brew "sd"
+brew "dust"
+brew "git-delta"
+brew "btop"
+brew "mas"
+
+# ── GUI apps (both machines) ─────────────────────────────────
+cask "bitwarden"
+cask "ghostty"
+cask "font-jetbrains-mono-nerd-font"
+cask "google-chrome"
+cask "iina"
+cask "appcleaner"
+
+{{ if .is_mbp -}}
+# ── MacBook Pro only ─────────────────────────────────────────
+cask "visual-studio-code"
+cask "orbstack"
+cask "temurin"
+cask "bruno"
+cask "wireshark"
+cask "intellij-idea"
+cask "clion"
+cask "webstorm"
+cask "rubymine"
+cask "tower"
+cask "claude"
+cask "duckduckgo"
+cask "typora"
+cask "discord"
+cask "stats"
+cask "tg-pro"
+cask "pdfsam-basic"
+cask "ollama"
+cask "synology-drive"
+cask "affinity"
+cask "obs"
+
+mas "WhatsApp", id: 310633997
+mas "WireGuard", id: 1451685025
+mas "Microsoft Word", id: 462054704
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft PowerPoint", id: 462062816
+mas "Windows App", id: 1295203466
+{{ end -}}

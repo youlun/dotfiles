@@ -1,0 +1,6 @@
+{{- $profile := promptStringOnce . "profile" "Profile (yw-macbook-pro or yw-mac-mini)" -}}
+
+[data]
+    profile = {{ $profile | quote }}
+    is_mbp = {{ eq $profile "yw-macbook-pro" }}
+    is_mini = {{ eq $profile "yw-mac-mini" }}

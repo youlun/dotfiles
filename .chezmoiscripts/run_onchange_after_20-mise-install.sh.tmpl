@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+set -euo pipefail
+eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$(mise activate bash)"
+
+mise install --yes
