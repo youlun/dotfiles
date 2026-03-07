@@ -47,4 +47,3 @@ defaults write -g NSDocumentSaveNewDocumentsToCloud -bool false
 # Restart affected services
 killall Dock 2>/dev/null || true
 killall Finder 2>/dev/null || true
-killall SystemUIServer 2>/dev/null || true
