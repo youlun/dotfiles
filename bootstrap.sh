@@ -265,12 +265,12 @@ step_brew_bundle() {
             if brew list "$flag" "$pkg" &>/dev/null; then
                 ok "$pkg $counter"
             else
-                spinner_start "Installing $pkg"
+                printf '  … %s %s' "$pkg" "$counter" >/dev/tty 2>/dev/null || true
                 if brew install $flag "$pkg" >> "$LOG_FILE" 2>&1; then
-                    spinner_stop
+                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
                     ok "$pkg $counter"
                 else
-                    spinner_stop
+                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
                     fail "$pkg $counter"
                     install_failed+=("${type}: $pkg")
                 fi
@@ -293,12 +293,12 @@ step_brew_bundle() {
             if mas list | grep -q "^$app_id "; then
                 ok "$app_name $counter"
             else
-                spinner_start "Installing $app_name"
+                printf '  … %s %s' "$app_name" "$counter" >/dev/tty 2>/dev/null || true
                 if mas install "$app_id" >> "$LOG_FILE" 2>&1; then
-                    spinner_stop
+                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
                     ok "$app_name $counter"
                 else
-                    spinner_stop
+                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
                     fail "$app_name $counter"
                     install_failed+=("mas: $app_name")
                 fi
