@@ -27,15 +27,17 @@ else
 fi
 
 echo ""
-echo "==> Checking bat theme..."
-if ! command -v bat &>/dev/null; then
-    echo "  - skipped (bat not installed)"
-elif [ -f "$(bat --config-dir)/themes/Catppuccin Mocha.tmTheme" ]; then
-    echo "  ✓ Catppuccin Mocha theme installed"
+echo "==> Checking GitHub authentication..."
+if command -v gh &>/dev/null; then
+    if gh auth status &>/dev/null 2>&1; then
+        echo "  ✓ GitHub authenticated"
+    else
+        echo "  ! GitHub not authenticated (run: gh auth login)"
+    fi
 else
-    echo "  ✗ bat theme not installed"
+    echo "  ✗ gh NOT FOUND"
     errors=$((errors + 1))
-    failed_items+=("bat: Catppuccin Mocha theme")
+    failed_items+=("CLI tool: gh")
 fi
 
 echo ""

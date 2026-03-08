@@ -21,7 +21,7 @@ fi
 
 # ── UX helpers ───────────────────────────────────────────────
 STEP_CURRENT=0
-STEP_TOTAL=8
+STEP_TOTAL=7
 LOG_FILE="${HOME}/bootstrap-$(date +%Y%m%d-%H%M%S).log"
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
 IS_MBP="false"
@@ -362,35 +362,7 @@ GITCONF
     fi
 }
 
-# ── Step 6: bat theme ────────────────────────────────────────
-step_bat_theme() {
-    step "bat theme"
-
-    if ! command -v bat &>/dev/null; then
-        warn "bat not installed — skipping"
-        return 0
-    fi
-
-    local theme_dir
-    theme_dir="$(bat --config-dir)/themes"
-
-    if [ -f "${theme_dir}/Catppuccin Mocha.tmTheme" ]; then
-        ok "Catppuccin Mocha already installed"
-        return 0
-    fi
-
-    mkdir -p "$theme_dir"
-
-    if curl -fsSL -o "${theme_dir}/Catppuccin Mocha.tmTheme" \
-        "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme" 2>> "$LOG_FILE"; then
-        bat cache --build >> "$LOG_FILE" 2>&1
-        ok "Catppuccin Mocha installed"
-    else
-        fail "Failed to download bat theme (see log)"
-    fi
-}
-
-# ── Step 7: mise runtimes ────────────────────────────────────
+# ── Step 6: mise runtimes ────────────────────────────────────
 step_mise_install() {
     step "Runtime versions"
 
@@ -422,7 +394,7 @@ step_mise_install() {
     fi
 }
 
-# ── Step 8: Verify ───────────────────────────────────────────
+# ── Step 7: Verify ───────────────────────────────────────────
 step_verify() {
     step "Verification"
     bash "${CHEZMOI_SOURCE}/verify.sh" || true
@@ -448,7 +420,6 @@ main() {
     step_chezmoi
     step_brew_install
     step_gh_auth
-    step_bat_theme
     step_mise_install
 
     # OrbStack SSH placeholder (MBP only, before verify)
