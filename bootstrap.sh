@@ -204,11 +204,13 @@ step_brew_bundle() {
     fi
 
     # Try brew bundle
-    info "Installing packages..."
+    spinner_start "Installing packages"
     if brew bundle --file="$brewfile" >> "$LOG_FILE" 2>&1; then
+        spinner_stop
         ok "All packages installed"
         return 0
     fi
+    spinner_stop
 
     # Brew bundle failed — collect what's missing
     warn "brew bundle had failures"
@@ -242,6 +244,14 @@ step_brew_bundle() {
 
     echo ""
     local install_failed=()
+    local pkg_current=0
+    local pkg_total=0
+
+    # Count total packages
+    pkg_total=$(( $(grep -c "^brew " "$brewfile") + $(grep -c "^cask " "$brewfile") ))
+    if command -v mas &>/dev/null && mas account &>/dev/null; then
+        pkg_total=$(( pkg_total + $(grep -c "^mas " "$brewfile") ))
+    fi
 
     # Helper: install brew entries by type
     _install_entries() {
@@ -250,13 +260,18 @@ step_brew_bundle() {
         local flag="--${type}"
         while IFS= read -r pkg; do
             [ -z "$pkg" ] && continue
+            pkg_current=$((pkg_current + 1))
+            local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
             if brew list "$flag" "$pkg" &>/dev/null; then
-                ok "$pkg (already installed)"
+                ok "$pkg $counter"
             else
+                spinner_start "Installing $pkg"
                 if brew install $flag "$pkg" >> "$LOG_FILE" 2>&1; then
-                    ok "$pkg"
+                    spinner_stop
+                    ok "$pkg $counter"
                 else
-                    fail "$pkg"
+                    spinner_stop
+                    fail "$pkg $counter"
                     install_failed+=("${type}: $pkg")
                 fi
             fi
@@ -273,13 +288,18 @@ step_brew_bundle() {
             local app_name app_id
             app_name=$(echo "$line" | sed 's/mas "\([^"]*\)".*/\1/')
             app_id=$(echo "$line" | sed 's/.*id: *\([0-9]*\).*/\1/')
+            pkg_current=$((pkg_current + 1))
+            local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
             if mas list | grep -q "^$app_id "; then
-                ok "$app_name (already installed)"
+                ok "$app_name $counter"
             else
+                spinner_start "Installing $app_name"
                 if mas install "$app_id" >> "$LOG_FILE" 2>&1; then
-                    ok "$app_name"
+                    spinner_stop
+                    ok "$app_name $counter"
                 else
-                    fail "$app_name"
+                    spinner_stop
+                    fail "$app_name $counter"
                     install_failed+=("mas: $app_name")
                 fi
             fi
