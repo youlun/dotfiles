@@ -2,6 +2,7 @@
 set -euo pipefail
 
 errors=0
+failed_items=()
 
 echo "==> Checking CLI tools..."
 for cmd in git gh mise zoxide fzf fd rg bat eza lazygit starship atuin sd dust delta mactop mas; do
@@ -10,6 +11,7 @@ for cmd in git gh mise zoxide fzf fd rg bat eza lazygit starship atuin sd dust d
     else
         echo "  ✗ $cmd NOT FOUND"
         errors=$((errors + 1))
+        failed_items+=("CLI tool: $cmd")
     fi
 done
 
@@ -21,6 +23,19 @@ else
     echo "  ✗ Some Brewfile entries missing"
     brew bundle check --file="${HOME}/.config/homebrew/Brewfile" --verbose 2>&1 | head -20
     errors=$((errors + 1))
+    failed_items+=("Brewfile: some entries missing")
+fi
+
+echo ""
+echo "==> Checking bat theme..."
+if ! command -v bat &>/dev/null; then
+    echo "  - skipped (bat not installed)"
+elif [ -f "$(bat --config-dir)/themes/Catppuccin Mocha.tmTheme" ]; then
+    echo "  ✓ Catppuccin Mocha theme installed"
+else
+    echo "  ✗ bat theme not installed"
+    errors=$((errors + 1))
+    failed_items+=("bat: Catppuccin Mocha theme")
 fi
 
 echo ""
@@ -39,6 +54,7 @@ for runtime in ruby node python; do
     else
         echo "  ✗ $runtime NOT INSTALLED"
         errors=$((errors + 1))
+        failed_items+=("mise runtime: $runtime")
     fi
 done
 
@@ -46,6 +62,14 @@ echo ""
 if [ "$errors" -eq 0 ]; then
     echo "All checks passed."
 else
-    echo "$errors check(s) failed."
+    echo "$errors check(s) failed:"
+    for item in "${failed_items[@]}"; do
+        echo "  - $item"
+    done
+    echo ""
+    echo "Recovery:"
+    echo "  brew bundle --file=~/.config/homebrew/Brewfile   # install missing packages"
+    echo "  chezmoi apply --force                            # re-run setup scripts"
+    echo "  bash ~/.local/share/chezmoi/verify.sh            # re-verify"
     exit 1
 fi
