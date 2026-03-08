@@ -1,25 +1,27 @@
 # Managed by chezmoi — do not edit directly
 
-# ── CLI tools (both machines) ────────────────────────────────
+# ── Formulas ─────────────────────────────────────────────────
+
 brew "git"
 brew "gh"
 brew "mise"
-brew "zoxide"
-brew "fzf"
-brew "fd"
+brew "git-delta"
+brew "lazygit"
 brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "zoxide"
 brew "bat"
 brew "eza"
-brew "lazygit"
-brew "starship"
-brew "atuin"
 brew "sd"
 brew "dust"
-brew "git-delta"
+brew "starship"
+brew "atuin"
 brew "mactop"
 brew "mas"
 
-# ── GUI apps (both machines) ─────────────────────────────────
+# ── Casks ────────────────────────────────────────────────────
+
 cask "bitwarden"
 cask "ghostty"
 cask "font-jetbrains-mono-nerd-font"
@@ -28,29 +30,29 @@ cask "iina"
 cask "appcleaner"
 
 {{ if .is_mbp -}}
-# ── MacBook Pro only ─────────────────────────────────────────
+cask "synology-drive"
 cask "visual-studio-code"
-cask "orbstack"
-cask "temurin"
-cask "bruno"
-cask "wireshark"
 cask "intellij-idea"
 cask "clion"
 cask "webstorm"
 cask "rubymine"
 cask "tower"
-cask "duckduckgo"
+cask "orbstack"
+cask "temurin"
+cask "bruno"
+cask "wireshark"
 cask "typora"
-cask "discord"
-cask "stats"
-cask "tg-pro"
 cask "pdfsam-basic"
-cask "synology-drive"
 cask "affinity"
 cask "obs"
+cask "stats"
+cask "duckduckgo"
+cask "discord"
 
-mas "WhatsApp", id: 310633997
+# ── App Store ────────────────────────────────────────────────
+
 mas "WireGuard", id: 1451685025
+mas "WhatsApp", id: 310633997
 mas "Microsoft Word", id: 462054704
 mas "Microsoft Excel", id: 462058435
 mas "Microsoft PowerPoint", id: 462062816
