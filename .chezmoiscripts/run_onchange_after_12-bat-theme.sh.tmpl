@@ -5,7 +5,7 @@ set -euo pipefail
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 if ! command -v bat &>/dev/null; then
-    echo "bat not found, skipping theme install"
+    echo "==> bat not found, skipping theme install"
     exit 0
 fi
 

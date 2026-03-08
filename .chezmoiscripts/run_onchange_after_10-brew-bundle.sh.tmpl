@@ -3,10 +3,12 @@
 set -euo pipefail
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+echo "==> Installing Brewfile packages (this may take a while)..."
 brew bundle --file="${HOME}/.config/homebrew/Brewfile" || {
     echo ""
     echo "Warning: brew bundle had failures."
     echo "  - If MAS apps failed, sign into the App Store and re-run: chezmoi apply"
+    echo "  - Run 'brew bundle --file=~/.config/homebrew/Brewfile' to retry."
 }
 
 {{ if .is_mbp -}}

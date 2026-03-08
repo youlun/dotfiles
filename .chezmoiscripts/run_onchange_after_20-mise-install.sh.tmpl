@@ -2,6 +2,14 @@
 # mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
 set -euo pipefail
 eval "$(/opt/homebrew/bin/brew shellenv)"
+
+if ! command -v mise &>/dev/null; then
+    echo "mise not found, skipping runtime install"
+    echo "  Run 'brew install mise && mise install' after fixing brew bundle."
+    exit 0
+fi
+
 eval "$(mise activate bash)"
 
+echo "==> Installing mise runtimes (ruby, node, python)..."
 mise install --yes

@@ -27,12 +27,23 @@ if [ -d "$CHEZMOI_SOURCE/.git" ]; then
     chezmoi update --verbose
 else
     echo "==> Initializing dotfiles..."
-    chezmoi init --apply --verbose https://github.com/youlun/dotfiles
+    if ! chezmoi init --apply --verbose https://github.com/youlun/dotfiles; then
+        echo ""
+        echo "Warning: chezmoi finished with errors (see above)."
+        echo "  Your dotfiles have been applied, but some post-install scripts may have failed."
+        echo "  Fix any issues and re-run: chezmoi apply"
+    fi
 fi
 
 echo ""
 echo "==> Running verification..."
-bash "${CHEZMOI_SOURCE}/verify.sh"
+if bash "${CHEZMOI_SOURCE}/verify.sh"; then
+    echo ""
+    echo "Bootstrap complete!"
+else
+    echo ""
+    echo "Some checks failed — review the output above."
+fi
 
 echo ""
 echo "Manual steps:"
