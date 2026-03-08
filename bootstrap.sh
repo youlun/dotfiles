@@ -123,12 +123,17 @@ step_chezmoi() {
     local chezmoi_rc=0
 
     if [ -d "$CHEZMOI_SOURCE/.git" ]; then
-        spinner_start "Updating dotfiles"
-        chezmoi update --force --verbose >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+        spinner_start "Pulling dotfiles"
+        chezmoi git -- pull --autostash --rebase >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
         spinner_stop
+        if [ "$chezmoi_rc" -eq 0 ]; then
+            spinner_start "Applying dotfiles"
+            chezmoi apply --force --verbose >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+            spinner_stop
+        fi
     else
         spinner_start "Initializing dotfiles"
-        chezmoi init --apply --verbose https://github.com/youlun/dotfiles >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+        chezmoi init --apply --force --verbose https://github.com/youlun/dotfiles >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
         spinner_stop
     fi
 
