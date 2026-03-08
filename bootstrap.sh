@@ -169,7 +169,7 @@ step_brew_bundle() {
     ok "Homebrew updated"
 
     # Check if already complete
-    if brew bundle check --file="$brewfile" --quiet >> "$LOG_FILE" 2>&1; then
+    if brew bundle check --file="$brewfile" --quiet >/dev/null 2>&1; then
         ok "All packages already installed"
         return 0
     fi
