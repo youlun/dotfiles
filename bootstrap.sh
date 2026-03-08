@@ -254,11 +254,11 @@ step_brew_install() {
             [ -z "$pkg" ] && continue
             pkg_current=$((pkg_current + 1))
             local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
-            if brew list "$flag" "$pkg" &>/dev/null; then
+            if brew list "$flag" "$pkg" </dev/null &>/dev/null; then
                 ok "$pkg $counter"
             else
                 printf '  … %s %s' "$pkg" "$counter" >/dev/tty 2>/dev/null || true
-                if brew install "$flag" "$pkg" >> "$LOG_FILE" 2>&1; then
+                if brew install "$flag" "$pkg" </dev/null >> "$LOG_FILE" 2>&1; then
                     printf '\r\033[K' >/dev/tty 2>/dev/null || true
                     ok "$pkg $counter"
                 else
@@ -285,11 +285,11 @@ step_brew_install() {
                 app_id="${app_id%%[!0-9]*}"
                 pkg_current=$((pkg_current + 1))
                 local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
-                if mas list | grep -q "^$app_id "; then
+                if mas list </dev/null | grep -q "^$app_id "; then
                     ok "$app_name $counter"
                 else
                     printf '  … %s %s' "$app_name" "$counter" >/dev/tty 2>/dev/null || true
-                    if mas install "$app_id" >> "$LOG_FILE" 2>&1; then
+                    if mas install "$app_id" </dev/null >> "$LOG_FILE" 2>&1; then
                         printf '\r\033[K' >/dev/tty 2>/dev/null || true
                         ok "$app_name $counter"
                     else
