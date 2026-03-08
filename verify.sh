@@ -16,14 +16,14 @@ for cmd in git gh mise zoxide fzf fd rg bat eza lazygit starship atuin sd dust d
 done
 
 echo ""
-echo "==> Checking brew bundle..."
+echo "==> Checking Brewfile..."
 if brew bundle check --file="${HOME}/.config/homebrew/Brewfile" &>/dev/null; then
     echo "  ✓ All Brewfile entries installed"
 else
-    echo "  ✗ Some Brewfile entries missing"
-    brew bundle check --file="${HOME}/.config/homebrew/Brewfile" --verbose 2>&1 | head -20
+    local_missing=$(brew bundle check --file="${HOME}/.config/homebrew/Brewfile" --verbose 2>&1 | grep -c "^→" || true)
+    echo "  ✗ ${local_missing} Brewfile entries missing (re-run bootstrap.sh)"
     errors=$((errors + 1))
-    failed_items+=("Brewfile: some entries missing")
+    failed_items+=("Brewfile: ${local_missing} entries missing")
 fi
 
 echo ""
