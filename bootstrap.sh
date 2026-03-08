@@ -342,7 +342,7 @@ step_mise_install() {
 # ── Step 7: Verify ───────────────────────────────────────────
 step_verify() {
     step "Verification"
-    bash "${CHEZMOI_SOURCE}/verify.sh" 2>&1 | tee -a "$LOG_FILE" || true
+    bash "${CHEZMOI_SOURCE}/verify.sh" || true
 }
 
 # ── Manual steps ─────────────────────────────────────────────
