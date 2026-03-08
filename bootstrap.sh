@@ -123,11 +123,13 @@ step_chezmoi() {
     local chezmoi_rc=0
 
     if [ -d "$CHEZMOI_SOURCE/.git" ]; then
-        info "Updating dotfiles..."
-        chezmoi update --verbose >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+        spinner_start "Updating dotfiles"
+        chezmoi update --force --verbose >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+        spinner_stop
     else
-        info "Initializing dotfiles..."
+        spinner_start "Initializing dotfiles"
         chezmoi init --apply --verbose https://github.com/youlun/dotfiles >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
+        spinner_stop
     fi
 
     if [ "$chezmoi_rc" -eq 0 ]; then
@@ -162,7 +164,7 @@ step_brew_bundle() {
     ok "Homebrew updated"
 
     # Check if already complete
-    if brew bundle check --file="$brewfile" --quiet 2>/dev/null; then
+    if brew bundle check --file="$brewfile" --quiet >> "$LOG_FILE" 2>&1; then
         ok "All packages already installed"
         return 0
     fi
