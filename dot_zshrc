@@ -4,18 +4,19 @@ HISTSIZE=50000
 SAVEHIST=50000
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_FIND_NO_DUPS
 setopt HIST_IGNORE_SPACE
 
 # Completion (cached — regenerates once per day)
 fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 autoload -Uz compinit
-setopt EXTENDED_GLOB
-if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-else
-    compinit -C
-fi
+() {
+    setopt LOCAL_OPTIONS EXTENDED_GLOB
+    if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+        compinit
+    else
+        compinit -C
+    fi
+}
 
 # Prompt
 command -v starship &>/dev/null && eval "$(starship init zsh)"
