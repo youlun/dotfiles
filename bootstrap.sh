@@ -182,7 +182,7 @@ step_chezmoi() {
 }
 
 # ── Step 4: Homebrew packages ────────────────────────────────
-step_brew_bundle() {
+step_brew_install() {
     step "Homebrew packages"
 
     local brewfile="${HOME}/.config/homebrew/Brewfile"
@@ -204,46 +204,6 @@ step_brew_bundle() {
         return 0
     fi
 
-    # Try brew bundle
-    spinner_start "Installing packages"
-    if brew bundle --file="$brewfile" >> "$LOG_FILE" 2>&1; then
-        spinner_stop
-        ok "All packages installed"
-        return 0
-    fi
-    spinner_stop
-
-    # Brew bundle failed — collect what's missing
-    warn "brew bundle had failures"
-    echo ""
-
-    local failed=()
-    local line
-
-    while IFS= read -r line; do
-        failed+=("$line")
-    done < <(brew bundle check --file="$brewfile" --verbose 2>&1 | grep "^→" || true)
-
-    if [ ${#failed[@]} -eq 0 ]; then
-        warn "Could not determine which packages failed"
-        return 1
-    fi
-
-    echo "  ${#failed[@]} package(s) need attention:"
-    for line in "${failed[@]}"; do
-        echo "    $line"
-    done
-    echo ""
-
-    # Prompt to retry individually
-    printf "  Install packages individually? [Y/n] "
-    read -r answer </dev/tty
-    if [[ "$answer" =~ ^[Nn] ]]; then
-        warn "Skipped individual install"
-        return 1
-    fi
-
-    echo ""
     local install_failed=()
     local pkg_current=0
     local pkg_total=0
@@ -414,7 +374,7 @@ main() {
     step_preflight
     step_homebrew
     step_chezmoi
-    step_brew_bundle
+    step_brew_install
     step_bat_theme
     step_mise_install
 
