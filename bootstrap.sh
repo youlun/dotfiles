@@ -147,6 +147,39 @@ step_homebrew() {
 }
 
 # ── Step 3: Dotfiles & macOS defaults ────────────────────────
+prompt_profile() {
+    local profiles=("yw-macbook-pro" "yw-mac-mini")
+    local choice
+
+    echo ""
+    echo "  ${BOLD}Select profile:${RESET}"
+    for i in "${!profiles[@]}"; do
+        echo "    $((i + 1))) ${profiles[$i]}"
+    done
+    echo ""
+    printf "  Choice [1]: " >/dev/tty
+    read -r choice </dev/tty 2>/dev/null || choice=""
+    choice="${choice:-1}"
+
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [ "$choice" -lt 1 ] || [ "$choice" -gt "${#profiles[@]}" ]; then
+        fail "Invalid choice"
+        exit 1
+    fi
+
+    PROFILE="${profiles[$((choice - 1))]}"
+    ok "Profile: ${PROFILE}"
+
+    # Pre-seed chezmoi config so init won't prompt
+    local config_dir="${HOME}/.config/chezmoi"
+    mkdir -p "$config_dir"
+    cat > "${config_dir}/chezmoi.toml" <<TOML
+[data]
+    profile = "$PROFILE"
+    is_mbp = $([ "$PROFILE" = "yw-macbook-pro" ] && echo "true" || echo "false")
+    is_mini = $([ "$PROFILE" = "yw-mac-mini" ] && echo "true" || echo "false")
+TOML
+}
+
 step_chezmoi() {
     step "Dotfiles & macOS defaults"
 
@@ -162,6 +195,11 @@ step_chezmoi() {
             spinner_stop
         fi
     else
+        # Prompt for profile before init so chezmoi doesn't need to ask
+        if [ ! -f "${HOME}/.config/chezmoi/chezmoi.toml" ]; then
+            prompt_profile
+        fi
+
         spinner_start "Initializing dotfiles"
         chezmoi init --apply --force --verbose https://github.com/youlun/dotfiles >> "$LOG_FILE" 2>&1 || chezmoi_rc=$?
         spinner_stop
