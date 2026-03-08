@@ -2,6 +2,13 @@
 # mise config hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
 set -euo pipefail
 eval "$(/opt/homebrew/bin/brew shellenv)"
-eval "$(mise activate bash)"
 
+if ! command -v mise &>/dev/null; then
+    echo "mise not found, skipping runtime install"
+    echo "  Install mise first: brew install mise"
+    echo "  Then retry: chezmoi apply"
+    exit 0
+fi
+
+eval "$(mise activate bash)"
 mise install --yes
