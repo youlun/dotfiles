@@ -4,7 +4,7 @@ set -euo pipefail
 errors=0
 
 echo "==> Checking CLI tools..."
-for cmd in git gh mise zoxide fzf fd rg bat eza lazygit starship atuin sd dust delta btop mas; do
+for cmd in git gh mise zoxide fzf fd rg bat eza lazygit starship atuin sd dust delta mactop mas; do
     if command -v "$cmd" &>/dev/null; then
         echo "  ✓ $cmd"
     else
