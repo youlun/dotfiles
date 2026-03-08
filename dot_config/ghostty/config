@@ -1,0 +1,7 @@
+theme = Catppuccin Mocha
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 14
+cursor-style = bar
+window-padding-x = 4
+window-padding-y = 4
+window-save-state = always
