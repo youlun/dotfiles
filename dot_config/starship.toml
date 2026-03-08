@@ -1,5 +1,23 @@
 palette = "catppuccin_mocha"
 
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"
+
+[directory]
+truncation_length = 3
+style = "bold blue"
+
+[git_branch]
+style = "bold mauve"
+
+[git_status]
+style = "bold red"
+
+[cmd_duration]
+min_time = 2000
+style = "bold yellow"
+
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
