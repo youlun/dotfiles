@@ -21,7 +21,7 @@ fi
 
 # ── UX helpers ───────────────────────────────────────────────
 STEP_CURRENT=0
-STEP_TOTAL=7
+STEP_TOTAL=8
 LOG_FILE="${HOME}/bootstrap-$(date +%Y%m%d-%H%M%S).log"
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
 IS_MBP="false"
@@ -325,7 +325,44 @@ step_brew_install() {
     fi
 }
 
-# ── Step 5: bat theme ────────────────────────────────────────
+# ── Step 5: GitHub authentication ────────────────────────────
+step_gh_auth() {
+    step "GitHub authentication"
+
+    if ! command -v gh &>/dev/null; then
+        warn "gh not installed — skipping"
+        return 0
+    fi
+
+    if gh auth status &>/dev/null 2>&1; then
+        ok "Already authenticated"
+    else
+        info "Authenticate with GitHub (opens browser)"
+        if gh auth login --web --git-protocol https </dev/tty >/dev/tty 2>/dev/tty; then
+            ok "GitHub authenticated"
+        else
+            warn "Skipped — git push won't work until you run: gh auth login"
+            return 0
+        fi
+    fi
+
+    # Write credential helper to local git config (not chezmoi-managed)
+    local local_config="${HOME}/.config/git/local"
+    if ! grep -q 'gh auth git-credential' "$local_config" 2>/dev/null; then
+        mkdir -p "$(dirname "$local_config")"
+        cat >> "$local_config" <<'GITCONF'
+[credential "https://github.com"]
+    helper =
+    helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/opt/homebrew/bin/gh auth git-credential
+GITCONF
+        ok "Git credential helper configured"
+    fi
+}
+
+# ── Step 6: bat theme ────────────────────────────────────────
 step_bat_theme() {
     step "bat theme"
 
@@ -353,7 +390,7 @@ step_bat_theme() {
     fi
 }
 
-# ── Step 6: mise runtimes ────────────────────────────────────
+# ── Step 7: mise runtimes ────────────────────────────────────
 step_mise_install() {
     step "Runtime versions"
 
@@ -385,7 +422,7 @@ step_mise_install() {
     fi
 }
 
-# ── Step 7: Verify ───────────────────────────────────────────
+# ── Step 8: Verify ───────────────────────────────────────────
 step_verify() {
     step "Verification"
     bash "${CHEZMOI_SOURCE}/verify.sh" || true
@@ -395,9 +432,8 @@ step_verify() {
 print_summary() {
     echo ""
     echo "${BOLD}Manual steps:${RESET}"
-    echo "  1. Open Bitwarden and sign in"
-    echo "  2. Enable Bitwarden SSH agent"
-    echo "  3. Sign into browsers"
+    echo "  1. Sign into browsers"
+    echo "  2. Open Bitwarden and sign in"
     echo ""
     info "${DIM}Full log: ${LOG_FILE}${RESET}"
 }
@@ -411,6 +447,7 @@ main() {
     step_homebrew
     step_chezmoi
     step_brew_install
+    step_gh_auth
     step_bat_theme
     step_mise_install
 

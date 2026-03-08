@@ -48,3 +48,5 @@
 [alias]
     l = log --oneline --graph --decorate -20
     s = status -s
+[include]
+    path = ~/.config/git/local
