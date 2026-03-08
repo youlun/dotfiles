@@ -198,21 +198,14 @@ step_brew_install() {
     spinner_stop
     ok "Homebrew updated"
 
-    # Check if already complete
-    if brew bundle check --file="$brewfile" --quiet >/dev/null 2>&1; then
-        ok "All packages already installed"
-        return 0
-    fi
-
     local install_failed=()
     local pkg_current=0
     local pkg_total=0
+    local mas_count=0
 
-    # Count total packages
-    pkg_total=$(( $(grep -c "^brew " "$brewfile") + $(grep -c "^cask " "$brewfile") ))
-    if command -v mas &>/dev/null && mas account &>/dev/null; then
-        pkg_total=$(( pkg_total + $(grep -c "^mas " "$brewfile") ))
-    fi
+    # Count total packages (always include MAS for accurate counter)
+    mas_count=$(grep -c "^mas " "$brewfile" || true)
+    pkg_total=$(( $(grep -c "^brew " "$brewfile") + $(grep -c "^cask " "$brewfile") + mas_count ))
 
     # Helper: install brew entries by type
     _install_entries() {
@@ -243,30 +236,32 @@ step_brew_install() {
     _install_entries "cask" "cask"
 
     # Install MAS apps individually
-    if command -v mas &>/dev/null && mas account &>/dev/null; then
-        while IFS= read -r line; do
-            [ -z "$line" ] && continue
-            local app_name app_id
-            app_name=$(echo "$line" | sed 's/mas "\([^"]*\)".*/\1/')
-            app_id=$(echo "$line" | sed 's/.*id: *\([0-9]*\).*/\1/')
-            pkg_current=$((pkg_current + 1))
-            local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
-            if mas list | grep -q "^$app_id "; then
-                ok "$app_name $counter"
-            else
-                printf '  … %s %s' "$app_name" "$counter" >/dev/tty 2>/dev/null || true
-                if mas install "$app_id" >> "$LOG_FILE" 2>&1; then
-                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
+    if [ "$mas_count" -gt 0 ]; then
+        if command -v mas &>/dev/null && mas account &>/dev/null; then
+            while IFS= read -r line; do
+                [ -z "$line" ] && continue
+                local app_name app_id
+                app_name=$(echo "$line" | sed 's/mas "\([^"]*\)".*/\1/')
+                app_id=$(echo "$line" | sed 's/.*id: *\([0-9]*\).*/\1/')
+                pkg_current=$((pkg_current + 1))
+                local counter="${DIM}(${pkg_current}/${pkg_total})${RESET}"
+                if mas list | grep -q "^$app_id "; then
                     ok "$app_name $counter"
                 else
-                    printf '\r\033[K' >/dev/tty 2>/dev/null || true
-                    fail "$app_name $counter"
-                    install_failed+=("mas: $app_name")
+                    printf '  … %s %s' "$app_name" "$counter" >/dev/tty 2>/dev/null || true
+                    if mas install "$app_id" >> "$LOG_FILE" 2>&1; then
+                        printf '\r\033[K' >/dev/tty 2>/dev/null || true
+                        ok "$app_name $counter"
+                    else
+                        printf '\r\033[K' >/dev/tty 2>/dev/null || true
+                        fail "$app_name $counter"
+                        install_failed+=("mas: $app_name")
+                    fi
                 fi
-            fi
-        done < <(grep '^mas ' "$brewfile")
-    else
-        info "${DIM}MAS apps skipped (not signed in or mas not available)${RESET}"
+            done < <(grep '^mas ' "$brewfile")
+        else
+            warn "MAS apps skipped — not signed in (${mas_count} packages)"
+        fi
     fi
 
     # Summary
@@ -277,15 +272,16 @@ step_brew_install() {
             echo "    - $item"
         done
         echo ""
+        local answer=""
         printf "  Continue with setup? [Y/n] "
-        read -r answer </dev/tty
+        read -r answer </dev/tty 2>/dev/null || answer="y"
         if [[ "$answer" =~ ^[Nn] ]]; then
             info "Stopped. Fix issues and re-run bootstrap."
             exit 1
         fi
     else
         echo ""
-        ok "All packages installed individually"
+        ok "All packages installed"
     fi
 }
 
