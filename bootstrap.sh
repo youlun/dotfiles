@@ -90,8 +90,9 @@ spinner_stop() {
     [ -e /dev/tty ] && printf '\r\033[K' >/dev/tty
 }
 
-# Clean up spinner on unexpected exit
+# Clean up on unexpected exit or interrupt
 trap 'spinner_stop' EXIT
+trap 'exit 130' INT TERM
 
 # ── Logging ──────────────────────────────────────────────────
 setup_logging() {
