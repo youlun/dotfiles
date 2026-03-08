@@ -68,8 +68,7 @@ else
     done
     echo ""
     echo "Recovery:"
-    echo "  brew bundle --file=~/.config/homebrew/Brewfile   # install missing packages"
-    echo "  chezmoi apply --force                            # re-run setup scripts"
-    echo "  bash ~/.local/share/chezmoi/verify.sh            # re-verify"
+    echo "  bash ~/.local/share/chezmoi/bootstrap.sh         # re-run bootstrap"
+    echo "  bash ~/.local/share/chezmoi/verify.sh            # re-verify only"
     exit 1
 fi
