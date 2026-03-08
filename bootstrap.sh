@@ -22,17 +22,24 @@ fi
 
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
 
+chezmoi_rc=0
 if [ -d "$CHEZMOI_SOURCE/.git" ]; then
     echo "==> Updating dotfiles..."
-    chezmoi update --verbose
+    chezmoi update --verbose || chezmoi_rc=$?
 else
     echo "==> Initializing dotfiles..."
-    chezmoi init --apply --verbose https://github.com/youlun/dotfiles
+    chezmoi init --apply --verbose https://github.com/youlun/dotfiles || chezmoi_rc=$?
+fi
+
+if [ "$chezmoi_rc" -ne 0 ]; then
+    echo ""
+    echo "Warning: chezmoi exited with status $chezmoi_rc (some scripts may have failed)."
+    echo "  Run 'chezmoi apply --force --verbose' to retry after fixing issues."
 fi
 
 echo ""
 echo "==> Running verification..."
-bash "${CHEZMOI_SOURCE}/verify.sh"
+bash "${CHEZMOI_SOURCE}/verify.sh" || true
 
 echo ""
 echo "Manual steps:"
