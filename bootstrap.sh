@@ -41,10 +41,39 @@ _SPINNER_PID=''
 spinner_start() {
     [ -e /dev/tty ] || return 0
     local label="$1"
+    local log_file="$LOG_FILE"
     (
+        local start=$SECONDS
+        local last_size last_change current_size
+        last_size=$(wc -c < "$log_file" 2>/dev/null || echo 0)
+        last_change=$SECONDS
         while true; do
             for frame in '⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏'; do
-                printf '\r  %s %s' "$frame" "$label" >/dev/tty
+                local elapsed=$(( SECONDS - start ))
+                local mins=$(( elapsed / 60 )) secs=$(( elapsed % 60 ))
+                local time_str
+                if [ "$mins" -gt 0 ]; then
+                    time_str="${mins}m $(printf '%02d' "$secs")s"
+                else
+                    time_str="${secs}s"
+                fi
+
+                # Check log growth once per cycle (every ~1s)
+                if [ "$frame" = '⠋' ]; then
+                    current_size=$(wc -c < "$log_file" 2>/dev/null || echo 0)
+                    if [ "$current_size" != "$last_size" ]; then
+                        last_size=$current_size
+                        last_change=$SECONDS
+                    fi
+                fi
+
+                local stall_secs=$(( SECONDS - last_change ))
+                local suffix=""
+                if [ "$stall_secs" -ge 30 ]; then
+                    suffix=" ${YELLOW}— no activity for ${stall_secs}s${RESET}"
+                fi
+
+                printf '\r\033[K  %s %s (%s)%s' "$frame" "$label" "$time_str" "$suffix" >/dev/tty
                 sleep 0.1
             done
         done
