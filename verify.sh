@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
+# Ensure mise shims are available when run standalone
+export PATH="${HOME}/.local/share/mise/shims:${PATH}"
+
+_tmp_brewfile=""
+trap '[ -n "$_tmp_brewfile" ] && rm -f "$_tmp_brewfile"' EXIT
+
 errors=0
 failed_items=()
 
@@ -17,7 +23,16 @@ done
 
 echo ""
 echo "==> Checking Brewfile..."
-if brew bundle check --file="${HOME}/.config/homebrew/Brewfile" &>/dev/null; then
+_brewfile="${HOME}/.config/homebrew/Brewfile"
+if command -v mas &>/dev/null && mas account &>/dev/null; then
+    _check_file="$_brewfile"
+else
+    _check_file=$(mktemp)
+    _tmp_brewfile="$_check_file"
+    grep -v '^mas ' "$_brewfile" > "$_check_file"
+    echo "  ! MAS not signed in — skipping App Store entries"
+fi
+if brew bundle check --file="$_check_file" &>/dev/null; then
     echo "  ✓ All Brewfile entries installed"
 else
     echo "  ✗ Brewfile entries missing (re-run bootstrap.sh)"
@@ -28,7 +43,7 @@ fi
 echo ""
 echo "==> Checking GitHub authentication..."
 if command -v gh &>/dev/null; then
-    if gh auth status &>/dev/null 2>&1; then
+    if gh auth status &>/dev/null; then
         echo "  ✓ GitHub authenticated"
     else
         echo "  ! GitHub not authenticated (run: gh auth login)"
