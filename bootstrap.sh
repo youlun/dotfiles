@@ -211,11 +211,9 @@ step_chezmoi() {
         warn "chezmoi exited with status $chezmoi_rc (see log for details)"
     fi
 
-    # Detect profile for OrbStack placeholder
-    if command -v chezmoi &>/dev/null; then
-        IS_MBP=$(chezmoi data --format json 2>/dev/null \
-            | python3 -c "import sys,json; print('true' if json.load(sys.stdin).get('is_mbp') else 'false')" 2>/dev/null \
-            || echo "false")
+    # Detect profile for downstream steps
+    if grep -q 'is_mbp = true' "${HOME}/.config/chezmoi/chezmoi.toml" 2>/dev/null; then
+        IS_MBP="true"
     fi
 }
 
