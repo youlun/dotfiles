@@ -311,6 +311,7 @@ step_brew_install() {
             done < <(grep '^mas ' "$brewfile")
         else
             warn "MAS apps skipped — not signed in (${mas_count} packages)"
+            pkg_total=$((pkg_total - mas_count))
         fi
     fi
 
