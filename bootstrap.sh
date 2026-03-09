@@ -285,7 +285,7 @@ step_brew_install() {
                     install_failed+=("${type}: $pkg")
                 fi
             fi
-        done < <(grep "^${prefix} " "$brewfile" | sed "s/${prefix} \"\([^\"]*\)\".*/\1/")
+        done < <(grep "^${prefix} " "$brewfile" | sed -E "s/^${prefix} ['\"]([^'\"]+)['\"].*/\1/")
     }
 
     _install_entries "formula" "brew"
