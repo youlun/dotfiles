@@ -195,7 +195,20 @@ step_chezmoi() {
         fi
     else
         # Prompt for profile before init so chezmoi doesn't need to ask
-        if [ ! -f "${HOME}/.config/chezmoi/chezmoi.toml" ]; then
+        if [ -f "${HOME}/.config/chezmoi/chezmoi.toml" ]; then
+            local existing_profile
+            existing_profile=$(grep '^    profile' "${HOME}/.config/chezmoi/chezmoi.toml" 2>/dev/null \
+                | sed 's/.*= *"\(.*\)"/\1/' || echo "unknown")
+            echo ""
+            printf "  Current profile: ${BOLD}%s${RESET}. Re-select? [y/N] " "$existing_profile" >/dev/tty
+            local reselect=""
+            read -r reselect </dev/tty 2>/dev/null || reselect=""
+            if [[ "$reselect" =~ ^[Yy] ]]; then
+                prompt_profile
+            else
+                ok "Keeping profile: ${existing_profile}"
+            fi
+        else
             prompt_profile
         fi
 
