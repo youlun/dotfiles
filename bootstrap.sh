@@ -142,6 +142,10 @@ step_homebrew() {
     else
         info "Installing chezmoi..."
         brew install chezmoi
+        if ! command -v chezmoi &>/dev/null; then
+            fail "chezmoi installation failed"
+            exit 1
+        fi
     fi
 }
 
