@@ -24,7 +24,6 @@ STEP_CURRENT=0
 STEP_TOTAL=7
 LOG_FILE="${HOME}/bootstrap-$(date +%Y%m%d-%H%M%S).log"
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
-IS_MBP="false"
 
 step() {
     STEP_CURRENT=$((STEP_CURRENT + 1))
@@ -211,10 +210,6 @@ step_chezmoi() {
         warn "chezmoi exited with status $chezmoi_rc (see log for details)"
     fi
 
-    # Detect profile for downstream steps
-    if grep -q 'is_mbp = true' "${HOME}/.config/chezmoi/chezmoi.toml" 2>/dev/null; then
-        IS_MBP="true"
-    fi
 }
 
 # ── Step 4: Homebrew packages ────────────────────────────────
@@ -419,12 +414,6 @@ main() {
     step_brew_install
     step_gh_auth
     step_mise_install
-
-    # OrbStack SSH placeholder (MBP only, before verify)
-    if [ "$IS_MBP" = "true" ] && [ ! -f ~/.orbstack/ssh/config ]; then
-        mkdir -p ~/.orbstack/ssh
-        touch ~/.orbstack/ssh/config
-    fi
 
     step_verify
     print_summary
