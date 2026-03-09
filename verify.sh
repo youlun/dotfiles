@@ -35,9 +35,7 @@ if command -v gh &>/dev/null; then
         echo "  ! GitHub not authenticated (run: gh auth login)"
     fi
 else
-    echo "  ✗ gh NOT FOUND"
-    errors=$((errors + 1))
-    failed_items+=("CLI tool: gh")
+    echo "  ! gh not found (already counted above)"
 fi
 
 echo ""
