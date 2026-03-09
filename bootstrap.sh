@@ -257,8 +257,11 @@ step_brew_install() {
     local mas_count=0
 
     # Count total packages (always include MAS for accurate counter)
+    local brew_count cask_count
+    brew_count=$(grep -c "^brew " "$brewfile" || true)
+    cask_count=$(grep -c "^cask " "$brewfile" || true)
     mas_count=$(grep -c "^mas " "$brewfile" || true)
-    pkg_total=$(( $(grep -c "^brew " "$brewfile") + $(grep -c "^cask " "$brewfile") + mas_count ))
+    pkg_total=$(( brew_count + cask_count + mas_count ))
 
     # Helper: install brew entries by type
     _install_entries() {
@@ -329,7 +332,7 @@ step_brew_install() {
         done
         echo ""
         local answer=""
-        printf "  Continue with setup? [Y/n] "
+        printf "  Continue with setup? [Y/n] " >/dev/tty
         read -r answer </dev/tty 2>/dev/null || answer="y"
         if [[ "$answer" =~ ^[Nn] ]]; then
             info "Stopped. Fix issues and re-run bootstrap."
