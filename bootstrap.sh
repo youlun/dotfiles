@@ -24,7 +24,6 @@ STEP_CURRENT=0
 STEP_TOTAL=7
 LOG_FILE="${HOME}/bootstrap-$(date +%Y%m%d-%H%M%S).log"
 CHEZMOI_SOURCE="${HOME}/.local/share/chezmoi"
-IS_MBP="false"
 
 step() {
     STEP_CURRENT=$((STEP_CURRENT + 1))
@@ -143,11 +142,20 @@ step_homebrew() {
     else
         info "Installing chezmoi..."
         brew install chezmoi
+        if ! command -v chezmoi &>/dev/null; then
+            fail "chezmoi installation failed"
+            exit 1
+        fi
     fi
 }
 
 # ── Step 3: Dotfiles & macOS defaults ────────────────────────
 prompt_profile() {
+    if [ ! -e /dev/tty ]; then
+        fail "Cannot prompt for profile: no TTY available (non-interactive environment)"
+        exit 1
+    fi
+
     local profiles=("yw-macbook-pro" "yw-mac-mini")
     local choice
 
@@ -196,7 +204,20 @@ step_chezmoi() {
         fi
     else
         # Prompt for profile before init so chezmoi doesn't need to ask
-        if [ ! -f "${HOME}/.config/chezmoi/chezmoi.toml" ]; then
+        if [ -f "${HOME}/.config/chezmoi/chezmoi.toml" ]; then
+            local existing_profile
+            existing_profile=$(grep '^    profile' "${HOME}/.config/chezmoi/chezmoi.toml" 2>/dev/null \
+                | sed 's/.*= *"\(.*\)"/\1/' || echo "unknown")
+            echo ""
+            printf "  Current profile: ${BOLD}%s${RESET}. Re-select? [y/N] " "$existing_profile" >/dev/tty
+            local reselect=""
+            read -r reselect </dev/tty 2>/dev/null || reselect=""
+            if [[ "$reselect" =~ ^[Yy] ]]; then
+                prompt_profile
+            else
+                ok "Keeping profile: ${existing_profile}"
+            fi
+        else
             prompt_profile
         fi
 
@@ -211,12 +232,6 @@ step_chezmoi() {
         warn "chezmoi exited with status $chezmoi_rc (see log for details)"
     fi
 
-    # Detect profile for OrbStack placeholder
-    if command -v chezmoi &>/dev/null; then
-        IS_MBP=$(chezmoi data --format json 2>/dev/null \
-            | python3 -c "import sys,json; print('true' if json.load(sys.stdin).get('is_mbp') else 'false')" 2>/dev/null \
-            || echo "false")
-    fi
 }
 
 # ── Step 4: Homebrew packages ────────────────────────────────
@@ -242,8 +257,11 @@ step_brew_install() {
     local mas_count=0
 
     # Count total packages (always include MAS for accurate counter)
+    local brew_count cask_count
+    brew_count=$(grep -c "^brew " "$brewfile" || true)
+    cask_count=$(grep -c "^cask " "$brewfile" || true)
     mas_count=$(grep -c "^mas " "$brewfile" || true)
-    pkg_total=$(( $(grep -c "^brew " "$brewfile") + $(grep -c "^cask " "$brewfile") + mas_count ))
+    pkg_total=$(( brew_count + cask_count + mas_count ))
 
     # Helper: install brew entries by type
     _install_entries() {
@@ -301,6 +319,7 @@ step_brew_install() {
             done < <(grep '^mas ' "$brewfile")
         else
             warn "MAS apps skipped — not signed in (${mas_count} packages)"
+            pkg_total=$((pkg_total - mas_count))
         fi
     fi
 
@@ -313,7 +332,7 @@ step_brew_install() {
         done
         echo ""
         local answer=""
-        printf "  Continue with setup? [Y/n] "
+        printf "  Continue with setup? [Y/n] " >/dev/tty
         read -r answer </dev/tty 2>/dev/null || answer="y"
         if [[ "$answer" =~ ^[Nn] ]]; then
             info "Stopped. Fix issues and re-run bootstrap."
@@ -421,12 +440,6 @@ main() {
     step_brew_install
     step_gh_auth
     step_mise_install
-
-    # OrbStack SSH placeholder (MBP only, before verify)
-    if [ "$IS_MBP" = "true" ] && [ ! -f ~/.orbstack/ssh/config ]; then
-        mkdir -p ~/.orbstack/ssh
-        touch ~/.orbstack/ssh/config
-    fi
 
     step_verify
     print_summary
