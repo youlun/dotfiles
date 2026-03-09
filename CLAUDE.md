@@ -2,8 +2,13 @@
 
 ## Overview
 - Managed with **chezmoi** — source at `~/.local/share/chezmoi/`
-- Profile: "yw-macbook-pro" (MacBook Pro, Apple Silicon)
+- Profiles: `yw-macbook-pro` (MacBook Pro) and `yw-mac-mini` (Mac mini), both Apple Silicon
 - Bootstrap: `bash <(curl -fsSL https://raw.githubusercontent.com/youlun/dotfiles/main/bootstrap.sh)`
+
+## Commands
+- Lint: `shellcheck bootstrap.sh verify.sh`
+- Syntax check: `bash -n bootstrap.sh && bash -n verify.sh`
+- Test templates: `chezmoi execute-template --config <config> < <file>.tmpl`
 
 ## Conventions
 - Profile selection happens in bootstrap.sh via numbered menu, pre-seeds `~/.config/chezmoi/chezmoi.toml`
