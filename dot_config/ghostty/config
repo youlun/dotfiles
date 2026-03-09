@@ -5,3 +5,5 @@ cursor-style = bar
 window-padding-x = 4
 window-padding-y = 4
 window-save-state = always
+working-directory = inherit
+mouse-hide-while-typing = true
