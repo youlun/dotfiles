@@ -22,6 +22,13 @@ jobs:
             shellcheck "${files[@]}"
           fi
 
+  syntax-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate shell syntax
+        run: bash -n bootstrap.sh && bash -n verify.sh
+
   chezmoi-validate:
     runs-on: ubuntu-latest
     strategy:
@@ -51,3 +58,79 @@ jobs:
             echo "Checking $f..."
             chezmoi execute-template --source . --config /tmp/chezmoi-test/chezmoi.toml < "$f" > /dev/null
           done
+
+  brewfile-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+      - name: Render and validate Brewfiles
+        run: |
+          valid_directives='^(brew|cask|mas|tap|vscode) '
+          exit_code=0
+          for profile in yw-macbook-pro yw-mac-mini; do
+            is_mbp=$( [ "$profile" = "yw-macbook-pro" ] && echo true || echo false )
+            is_mini=$( [ "$profile" = "yw-mac-mini" ] && echo true || echo false )
+            mkdir -p /tmp/chezmoi-test
+            cat > /tmp/chezmoi-test/chezmoi.toml <<TOML
+          [data]
+              profile = "$profile"
+              is_mbp = $is_mbp
+              is_mini = $is_mini
+          TOML
+            brewfile_tmpl=$(find . -name 'Brewfile.tmpl' ! -path './.git/*' | head -1)
+            if [ -z "$brewfile_tmpl" ]; then
+              echo "No Brewfile.tmpl found, skipping"
+              continue
+            fi
+            echo "==> Validating Brewfile for profile: $profile"
+            rendered=$(chezmoi execute-template --source . --config /tmp/chezmoi-test/chezmoi.toml < "$brewfile_tmpl")
+            while IFS= read -r line; do
+              # Skip blank lines and comments
+              [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+              # Skip lines that are only whitespace
+              [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+              if ! echo "$line" | grep -qE "$valid_directives"; then
+                echo "  ✗ Invalid line in $profile Brewfile: $line"
+                exit_code=1
+              fi
+            done <<< "$rendered"
+            if [ "$exit_code" -eq 0 ]; then
+              echo "  ✓ All lines valid for $profile"
+            fi
+          done
+          exit $exit_code
+
+  integration-test:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - profile: yw-macbook-pro
+            is_mbp: true
+            is_mini: false
+          - profile: yw-mac-mini
+            is_mbp: false
+            is_mini: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install chezmoi
+        run: |
+          sh -c "$(curl -fsLS get.chezmoi.io)" -- -b /usr/local/bin
+      - name: Setup chezmoi config (${{ matrix.profile }})
+        run: |
+          mkdir -p "${HOME}/.config/chezmoi"
+          cat > "${HOME}/.config/chezmoi/chezmoi.toml" <<TOML
+          [data]
+              profile = "${{ matrix.profile }}"
+              is_mbp = ${{ matrix.is_mbp }}
+              is_mini = ${{ matrix.is_mini }}
+          TOML
+      - name: chezmoi init --dry-run
+        run: chezmoi init --dry-run --source "$PWD"
+      - name: chezmoi apply --dry-run
+        run: chezmoi apply --dry-run --source "$PWD"
+      - name: Shell syntax check
+        run: bash -n bootstrap.sh && bash -n verify.sh
