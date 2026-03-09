@@ -20,10 +20,9 @@ echo "==> Checking Brewfile..."
 if brew bundle check --file="${HOME}/.config/homebrew/Brewfile" &>/dev/null; then
     echo "  ✓ All Brewfile entries installed"
 else
-    local_missing=$(brew bundle check --file="${HOME}/.config/homebrew/Brewfile" --verbose 2>&1 | grep -c "^→" || true)
-    echo "  ✗ ${local_missing} Brewfile entries missing (re-run bootstrap.sh)"
+    echo "  ✗ Brewfile entries missing (re-run bootstrap.sh)"
     errors=$((errors + 1))
-    failed_items+=("Brewfile: ${local_missing} entries missing")
+    failed_items+=("Brewfile: entries missing")
 fi
 
 echo ""
