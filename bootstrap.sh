@@ -151,6 +151,11 @@ step_homebrew() {
 
 # ── Step 3: Dotfiles & macOS defaults ────────────────────────
 prompt_profile() {
+    if [ ! -e /dev/tty ]; then
+        fail "Cannot prompt for profile: no TTY available (non-interactive environment)"
+        exit 1
+    fi
+
     local profiles=("yw-macbook-pro" "yw-mac-mini")
     local choice
 
