@@ -54,10 +54,10 @@ jobs:
               is_mbp = ${{ matrix.is_mbp }}
               is_mini = ${{ matrix.is_mini }}
           TOML
-          for f in $(find . -name '*.tmpl' ! -path './.chezmoi.toml.tmpl' ! -path './.git/*'); do
+          while IFS= read -r -d '' f; do
             echo "Checking $f..."
             chezmoi execute-template --source . --config /tmp/chezmoi-test/chezmoi.toml < "$f" > /dev/null
-          done
+          done < <(find . -name '*.tmpl' ! -path './.chezmoi.toml.tmpl' ! -path './.git/*' -print0)
 
   brewfile-validate:
     runs-on: ubuntu-latest
