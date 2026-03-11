@@ -5,7 +5,7 @@ set -euo pipefail
 
 # ── Mouse & Trackpad ──────────────────────────────────────────
 defaults write -g com.apple.mouse.scaling -float 2.0
-defaults write -g com.apple.trackpad.scaling -float 2.5
+defaults write -g com.apple.trackpad.scaling -float 2.0
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 
 # ── Dock ──────────────────────────────────────────────────────

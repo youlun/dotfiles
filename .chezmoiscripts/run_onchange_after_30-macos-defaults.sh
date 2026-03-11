@@ -14,7 +14,7 @@ defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
 # Trackpad
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-defaults write -g com.apple.trackpad.scaling -float 2.5
+defaults write -g com.apple.trackpad.scaling -float 2.0
 
 # Dock
 defaults write com.apple.dock autohide -bool true
