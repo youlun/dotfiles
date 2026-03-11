@@ -232,6 +232,11 @@ step_chezmoi() {
         warn "chezmoi exited with status $chezmoi_rc (see log for details)"
     fi
 
+    # macOS defaults
+    if [ -f "${CHEZMOI_SOURCE}/macos_defaults.sh" ]; then
+        bash "${CHEZMOI_SOURCE}/macos_defaults.sh" >> "$LOG_FILE" 2>&1
+        ok "macOS defaults applied"
+    fi
 }
 
 # ── Step 4: Homebrew packages ────────────────────────────────

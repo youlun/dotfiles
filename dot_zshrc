@@ -33,6 +33,78 @@ export FZF_DEFAULT_OPTS=" \
 --color=selected-bg:#45475A \
 --color=border:#6C7086,label:#CDD6F4"
 
+# Cheatsheet
+cheat() {
+    cat <<'SHEET'
+  MODERN CLI CHEATSHEET
+  ─────────────────────────────────────────────────────────────
+  rg (ripgrep) ← grep
+    rg "pattern"                  search current dir recursively
+    rg "pattern" src/             search in specific dir
+    rg -i "pattern"               case-insensitive
+    rg -l "pattern"               list matching files only
+    rg -t py "pattern"            filter by file type
+    rg "pattern" -g "*.json"      filter by glob
+
+  fd ← find
+    fd "pattern"                  find files matching pattern
+    fd -e tsx                     find by extension
+    fd -t d "pattern"             find directories only
+    fd "pattern" --exec rm {}     find and execute command
+
+  bat ← cat (aliased)
+    bat file.txt                  view with syntax highlighting
+    bat -l json file              force language highlighting
+    bat -p file                   plain mode (no line numbers)
+    bat -d file                   diff mode (show git changes)
+
+  eza ← ls (aliased)
+    eza                           list files (aliased to ls)
+    eza -la                       long list all (aliased to ll)
+    eza --tree                    tree view
+    eza --tree -L 2               tree view, 2 levels deep
+    eza --git                     show git status per file
+
+  sd ← sed
+    sd "old" "new" file           replace in file (in-place)
+    echo "hello" | sd "l" "r"     replace via pipe
+    sd -f i "old" "new" file      case-insensitive replace
+    sd "(\w+)" '$1_suffix' file   regex capture groups
+
+  dust ← du
+    dust                          disk usage of current dir
+    dust -r                       reverse sort (smallest first)
+    dust -d 2                     limit depth to 2 levels
+    dust /path                    disk usage of specific path
+
+  zoxide ← cd
+    z dirname                     jump to frecent directory
+    z foo bar                     jump to best match for "foo bar"
+    zi                            interactive selection with fzf
+
+  fzf (fuzzy finder)
+    ctrl-t                        fuzzy find files
+    ctrl-r                        fuzzy search shell history
+    cmd | fzf                     pipe anything into fuzzy finder
+    fzf --preview 'bat {}'        preview files with bat
+
+  git-delta ← diff (auto-configured via .gitconfig)
+    git diff                      enhanced diff output
+    git log -p                    enhanced patch view
+
+  lazygit
+    lazygit                       terminal UI for git
+
+  atuin (shell history)
+    ctrl-r                        search history (replaces fzf)
+    atuin stats                   history statistics
+
+  mactop
+    mactop                        Apple Silicon activity monitor
+  ─────────────────────────────────────────────────────────────
+SHEET
+}
+
 # Aliases
 command -v bat &>/dev/null && alias cat='bat'
 command -v eza &>/dev/null && { alias ls='eza --icons=auto --group-directories-first'; alias ll='eza -la --icons=auto --group-directories-first'; }
