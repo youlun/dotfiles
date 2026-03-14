@@ -7,6 +7,7 @@ set -euo pipefail
 defaults write -g com.apple.mouse.scaling -float 2.0
 defaults write -g com.apple.trackpad.scaling -float 2.0
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
 
 # ── Dock ──────────────────────────────────────────────────────
 defaults write com.apple.dock tilesize -int 39
@@ -57,8 +58,8 @@ defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
 
 # ── Screenshots ───────────────────────────────────────────────
 defaults write com.apple.screencapture type -string "png"
-defaults write com.apple.screencapture location -string "${HOME}/Documents/00 Inbox/Screenshots"
-mkdir -p "${HOME}/Documents/00 Inbox/Screenshots"
+defaults write com.apple.screencapture location -string "${HOME}/Documents/00 Inbox"
+mkdir -p "${HOME}/Documents/00 Inbox"
 
 # ── .DS_Store ─────────────────────────────────────────────────
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
